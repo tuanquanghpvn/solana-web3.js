@@ -3476,6 +3476,26 @@ export class Connection {
   }
 
   /**
+   * Fetch confirmed blocks with limit
+   */
+  async getBlocksWithLimit(
+    startSlot: number,
+    limit: number,
+    commitment?: Finality,
+  ): Promise<Array<number>> {
+    const args = this._buildArgsAtLeastConfirmed(
+      [startSlot, limit],
+      commitment,
+    );
+    const unsafeRes = await this._rpcRequest('getBlocksWithLimit', args);
+    const res = create(unsafeRes, jsonRpcResult(array(number())));
+    if ('error' in res) {
+      throw new Error('failed to get blocks: ' + res.error.message);
+    }
+    return res.result;
+  }
+
+  /**
    * Fetch a list of Signatures from the cluster for a block, excluding rewards
    */
   async getBlockSignatures(
